@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="かなトク">
+<meta name="theme-color" content="#f8fafc">
+<title>かなトク管理</title>
+<style>
+:root{
+  --bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#7b8499;--line:#e8ebf2;
+  --accent:#4f7cff;--accent2:#6ed0a8;--danger:#e4586c;--warning:#f5a623;
+  --shadow:0 14px 40px rgba(33,45,82,.10);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}
+body{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{max-width:720px;margin:auto}
+.topbar{
+  position:sticky;top:0;z-index:20;
+  padding:calc(12px + env(safe-area-inset-top)) 16px 12px;
+  background:rgba(245,247,251,.88);backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(232,235,242,.8)
+}
+.topline{display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:22px;font-weight:900;letter-spacing:-.02em}
+.iconbtn{border:0;background:#fff;width:42px;height:42px;border-radius:14px;box-shadow:var(--shadow);font-size:20px}
+.content{padding:14px}
+.hero{
+  background:linear-gradient(135deg,#4f7cff,#72a3ff);
+  color:#fff;border-radius:26px;padding:20px;box-shadow:0 18px 44px rgba(79,124,255,.26)
+}
+.hero .eyebrow{font-size:12px;opacity:.9}
+.hero .big{font-size:34px;font-weight:900;margin-top:6px}
+.hero .sub{font-size:13px;opacity:.92;margin-top:4px}
+.progress{height:10px;background:rgba(255,255,255,.28);border-radius:999px;overflow:hidden;margin:16px 0 6px}
+.progress span{display:block;height:100%;background:#fff;border-radius:999px}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.hero-mini{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);border-radius:16px;padding:12px}
+.hero-mini b{font-size:18px;display:block}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin:22px 2px 10px}
+.section-title h2{font-size:17px;margin:0}
+.section-title button{border:0;background:transparent;color:var(--accent);font-weight:700}
+.pay-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:5px;scrollbar-width:none}
+.pay-scroll::-webkit-scrollbar{display:none}
+.pay-card{
+  min-width:180px;background:var(--card);border-radius:20px;padding:15px;
+  box-shadow:var(--shadow);border:2px solid transparent
+}
+.pay-card.active{border-color:var(--accent)}
+.pay-head{display:flex;align-items:center;gap:9px}
+.pay-logo{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:#fff;font-weight:900}
+.pay-name{font-weight:800;font-size:14px}
+.pay-remain{font-size:24px;font-weight:900;margin-top:12px}
+.pay-sub{font-size:11px;color:var(--muted)}
+.mini-progress{height:7px;background:#edf0f6;border-radius:999px;overflow:hidden;margin-top:10px}
+.mini-progress span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.card{background:var(--card);border-radius:22px;padding:16px;box-shadow:var(--shadow);margin-top:12px}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.quick{
+  border:1px solid var(--line);background:#fff;border-radius:17px;padding:14px;text-align:left
+}
+.quick b{display:block;font-size:19px;margin-top:4px}
+.quick span{font-size:12px;color:var(--muted)}
+.history-row{display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.history-row:first-child{border-top:0}
+.store{font-weight:800}
+.meta{font-size:12px;color:var(--muted);margin-top:4px}
+.reward{text-align:right;white-space:nowrap}
+.reward b{font-size:17px;color:#19875f}
+.tag{display:inline-block;padding:3px 7px;border-radius:999px;background:#eef4ff;color:#3d66d8;font-size:10px;font-weight:800;margin-left:5px}
+.empty{text-align:center;color:var(--muted);padding:26px 8px}
+.fab{
+  position:fixed;right:18px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:30;
+  width:58px;height:58px;border:0;border-radius:20px;background:var(--accent);color:#fff;
+  font-size:31px;box-shadow:0 16px 34px rgba(79,124,255,.36)
+}
+.nav{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:0;z-index:25;
+  width:min(720px,100%);height:calc(76px + env(safe-area-inset-bottom));
+  background:rgba(255,255,255,.94);backdrop-filter:blur(18px);border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(3,1fr);padding:8px 12px env(safe-area-inset-bottom)
+}
+.nav button{border:0;background:transparent;color:var(--muted);font-size:11px;font-weight:700}
+.nav button.active{color:var(--accent)}
+.nav .ni{display:block;font-size:22px;margin-bottom:3px}
+.sheet{
+  position:fixed;inset:0;z-index:50;background:rgba(20,28,48,.38);display:none;align-items:flex-end
+}
+.sheet.open{display:flex}
+.sheet-panel{
+  width:min(720px,100%);margin:auto;background:#fff;border-radius:28px 28px 0 0;
+  padding:12px 18px calc(22px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto
+}
+.handle{width:44px;height:5px;background:#d9dde7;border-radius:999px;margin:2px auto 16px}
+.sheet h3{margin:0 0 16px;font-size:20px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field.full{grid-column:1/-1}
+label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px 2px}
+input,select{
+  width:100%;border:1px solid var(--line);background:#fbfcfe;border-radius:14px;padding:13px;
+  color:var(--text);font-size:16px
+}
+.primary{width:100%;border:0;background:var(--accent);color:#fff;border-radius:15px;padding:14px;font-weight:900;margin-top:14px}
+.ghost{width:100%;border:0;background:#eef2f8;color:var(--text);border-radius:15px;padding:13px;font-weight:800;margin-top:8px}
+.danger{background:#fff0f2;color:var(--danger)}
+.settings-row{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:14px 0;border-top:1px solid var(--line)}
+.settings-row:first-child{border-top:0}
+.settings-row strong{display:block}
+.settings-row small{color:var(--muted)}
+.settings-row input{width:110px;text-align:right}
+.hidden{display:none}
+@media(max-width:420px){.hero .big{font-size:31px}.pay-card{min-width:165px}.content{padding:12px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="topline">
+      <div class="brand">かなトク管理</div>
+      <button class="iconbtn" id="backupBtn" aria-label="バックアップ">⋯</button>
+    </div>
+  </header>
+
+  <main class="content">
+    <section id="homeView">
+      <div class="card" style="margin-top:0;border:1px solid #dfe6ff;background:linear-gradient(135deg,#ffffff,#f2f6ff)">
+        <div style="font-size:13px;color:#5f6f92;font-weight:800;margin-bottom:8px">かなトク還元上限</div>
+        <div style="font-size:18px;font-weight:900;line-height:1.6">
+          1つのQR決済につき <span style="color:#4f7cff">最大2,500円還元</span><br>
+          6種類合計で <span style="color:#e4586c">最大15,000円還元</span>
+        </div>
+        <div style="font-size:12px;color:#7b8499;margin-top:8px;line-height:1.6">
+          d払い・PayPay・au PAY・楽天ペイ・AEON Pay・メルペイは、それぞれ別に2,500円まで還元されます。
+        </div>
+      </div>
+
+      <div class="hero">
+        <div class="eyebrow">6種類合計の残り還元枠（最大15,000円）</div>
+        <div class="big" id="allRemain">15,000円</div>
+        <div class="sub" id="allUsed">還元見込み 0円 / 15,000円</div>
+        <div class="progress"><span id="allBar" style="width:0%"></span></div>
+        <div class="hero-grid">
+          <div class="hero-mini"><span>登録件数</span><b id="count">0件</b></div>
+          <div class="hero-mini"><span>今月の支払額</span><b id="monthSpend">0円</b></div>
+        </div>
+      </div>
+
+      <div class="section-title"><h2>決済サービス別</h2><button id="scrollHint">横に見られるよ →</button></div>
+      <div class="pay-scroll" id="payCards"></div>
+
+      <div class="section-title"><h2 id="selectedTitle">d払いの残り目安</h2></div>
+      <div class="quick-grid">
+        <button class="quick" data-rate="20"><span>20%還元店なら</span><b id="spend20">12,500円</b></button>
+        <button class="quick" data-rate="10"><span>10%還元店なら</span><b id="spend10">25,000円</b></button>
+      </div>
+
+      <div class="section-title"><h2>最近の利用</h2><button id="seeAll">すべて見る</button></div>
+      <div class="card" id="recent"></div>
+    </section>
+
+    <section id="historyView" class="hidden">
+      <div class="section-title"><h2>利用履歴</h2><button id="filterBtn">絞り込み</button></div>
+      <div class="card" id="allHistory"></div>
+    </section>
+
+    <section id="settingsView" class="hidden">
+      <div class="section-title"><h2>設定</h2></div>
+      <div class="card">
+        <div class="settings-row">
+          <div><strong>1つのQR決済あたりの還元上限</strong><small>6種類それぞれ2,500円</small></div>
+          <input id="periodCap" type="number" inputmode="numeric" min="1">
+        </div>
+        <div class="settings-row">
+          <div><strong>1回あたり上限</strong><small>初期値 1,500円</small></div>
+          <input id="txCap" type="number" inputmode="numeric" min="1">
+        </div>
+        <button id="saveSettings" class="primary">設定を保存</button>
+      </div>
+      <div class="card">
+        <button id="exportBtn" class="ghost">バックアップを書き出す</button>
+        <button id="importBtn" class="ghost">バックアップを読み込む</button>
+        <button id="clearBtn" class="ghost danger">すべての履歴を削除</button>
+        <input id="importFile" type="file" accept="application/json" hidden>
+      </div>
+      <div class="card" style="font-size:12px;color:var(--muted);line-height:1.6">
+        データはこの端末のブラウザ内だけに保存されます。ブラウザのデータを消すと履歴も消えるため、時々バックアップしておくと安心です。
+      </div>
+    </section>
+  </main>
+</div>
+
+<button class="fab" id="fab">＋</button>
+
+<nav class="nav">
+  <button class="active" data-view="home"><span class="ni">⌂</span>ホーム</button>
+  <button data-view="history"><span class="ni">🧾</span>履歴</button>
+  <button data-view="settings"><span class="ni">⚙︎</span>設定</button>
+</nav>
+
+<div class="sheet" id="entrySheet">
+  <div class="sheet-panel">
+    <div class="handle"></div>
+    <h3 id="sheetTitle">利用を追加</h3>
+    <div class="form-grid">
+      <div class="field">
+        <label>決済サービス</label>
+        <select id="pay"></select>
+      </div>
+      <div class="field">
+        <label>還元率</label>
+        <select id="rate"><option value="10">10%</option><option value="20">20%</option></select>
+      </div>
+      <div class="field">
+        <label>利用日</label>
+        <input id="date" type="date">
+      </div>
+      <div class="field">
+        <label>支払額</label>
+        <input id="amount" type="number" min="1" step="1" inputmode="numeric" placeholder="例 2857">
+      </div>
+      <div class="field full">
+        <label>お店（任意）</label>
+        <input id="store" type="text" placeholder="例 ハックドラッグ">
+      </div>
+      <div class="field full">
+        <label>メモ（任意）</label>
+        <input id="memo" type="text" placeholder="例 食料品">
+      </div>
+    </div>
+    <button class="primary" id="saveEntry">保存する</button>
+    <button class="ghost" id="cancelEntry">キャンセル</button>
+  </div>
+</div>
+
+<div class="sheet" id="menuSheet">
+  <div class="sheet-panel">
+    <div class="handle"></div>
+    <h3>データ管理</h3>
+    <button class="ghost" id="menuExport">バックアップを書き出す</button>
+    <button class="ghost" id="menuImport">バックアップを読み込む</button>
+    <button class="ghost" id="closeMenu">閉じる</button>
+  </div>
+</div>
+
+<script>
+const PAYS=[
+ {name:"AEON Pay",logo:"A",color:"#7a43d1"},
+ {name:"au PAY",logo:"au",color:"#ef6c22"},
+ {name:"d払い",logo:"d",color:"#d94b62"},
+ {name:"PayPay",logo:"P",color:"#ff3151"},
+ {name:"メルペイ",logo:"m",color:"#2e8cf0"},
+ {name:"楽天ペイ",logo:"R",color:"#bf143a"}
+];
+const $=id=>document.getElementById(id);
+const KEY="kanatoku-pro-v2";
+const SETKEY="kanatoku-pro-settings-v2";
+let rows=JSON.parse(localStorage.getItem(KEY)||"[]");
+let settings=JSON.parse(localStorage.getItem(SETKEY)||'{"periodCap":2500,"txCap":1500}');
+let selectedPay="d払い", editId=null, filterPay="すべて";
+
+$("pay").innerHTML=PAYS.map(p=>`<option>${p.name}</option>`).join("");
+$("pay").value=selectedPay;
+$("date").value=new Date().toISOString().slice(0,10);
+$("periodCap").value=settings.periodCap;
+$("txCap").value=settings.txCap;
+
+function yen(n){return Number(n||0).toLocaleString("ja-JP")+"円"}
+function rawReward(r){return Math.min(Math.floor(r.amount*r.rate/100),settings.txCap)}
+function compute(){
+  const sums=Object.fromEntries(PAYS.map(p=>[p.name,0]));
+  const effective={};
+  [...rows].sort((a,b)=>(a.date+a.created).localeCompare(b.date+b.created)).forEach(r=>{
+    const left=Math.max(0,settings.periodCap-sums[r.pay]);
+    effective[r.id]=Math.min(rawReward(r),left);
+    sums[r.pay]+=effective[r.id];
+  });
+  return {sums,effective};
+}
+function persist(){localStorage.setItem(KEY,JSON.stringify(rows));render()}
+function openSheet(id){$(id).classList.add("open")}
+function closeSheet(id){$(id).classList.remove("open")}
+
+function render(){
+  const {sums,effective}=compute();
+  const totalCap=settings.periodCap*PAYS.length;
+  const used=Object.values(sums).reduce((a,b)=>a+b,0);
+  const remain=totalCap-used;
+  $("allRemain").textContent=yen(remain);
+  $("allUsed").textContent=`還元見込み ${yen(used)} / ${yen(totalCap)}`;
+  $("allBar").style.width=Math.min(100,used/totalCap*100)+"%";
+  $("count").textContent=rows.length+"件";
+  const ym=new Date().toISOString().slice(0,7);
+  const monthSpend=rows.filter(r=>r.date.startsWith(ym)).reduce((s,r)=>s+Number(r.amount),0);
+  $("monthSpend").textContent=yen(monthSpend);
+
+  $("payCards").innerHTML=PAYS.map(p=>{
+    const u=sums[p.name], l=Math.max(0,settings.periodCap-u), pct=Math.min(100,u/settings.periodCap*100);
+    return `<button class="pay-card ${p.name===selectedPay?'active':''}" data-pay="${p.name}">
+      <div class="pay-head"><span class="pay-logo" style="background:${p.color}">${p.logo}</span><span class="pay-name">${p.name}</span></div>
+      <div class="pay-remain">${yen(l)}</div><div class="pay-sub">残り還元枠</div>
+      <div class="mini-progress"><span style="width:${pct}%"></span></div>
+      <div class="pay-sub" style="margin-top:5px">還元済み ${yen(u)} / 上限 ${yen(settings.periodCap)}</div>
+    </button>`;
+  }).join("");
+  document.querySelectorAll(".pay-card").forEach(b=>b.onclick=()=>{selectedPay=b.dataset.pay;$("pay").value=selectedPay;render()});
+
+  const left=Math.max(0,settings.periodCap-sums[selectedPay]);
+  $("selectedTitle").textContent=selectedPay+"の残り目安";
+  $("spend20").textContent=yen(Math.ceil(left/.2));
+  $("spend10").textContent=yen(Math.ceil(left/.1));
+
+  const sorted=[...rows].sort((a,b)=>(b.date+b.created).localeCompare(a.date+a.created));
+  $("recent").innerHTML=historyHtml(sorted.slice(0,5),effective);
+  const filtered=filterPay==="すべて"?sorted:sorted.filter(r=>r.pay===filterPay);
+  $("allHistory").innerHTML=historyHtml(filtered,effective,true);
+}
+function historyHtml(list,effective,full=false){
+  if(!list.length)return `<div class="empty">まだ利用履歴がありません</div>`;
+  return list.map(r=>`
+    <div class="history-row">
+      <div>
+        <div class="store">${r.store||"店舗名なし"}<span class="tag">${r.pay}</span></div>
+        <div class="meta">${r.date.replaceAll("-","/")}・${r.rate}%・支払 ${yen(r.amount)}${r.memo?"・"+r.memo:""}</div>
+        ${full?`<div class="meta"><button onclick="editRow('${r.id}')" style="border:0;background:none;color:#4f7cff;padding:5px 8px 0 0">編集</button><button onclick="deleteRow('${r.id}')" style="border:0;background:none;color:#e4586c;padding:5px 0 0">削除</button></div>`:""}
+      </div>
+      <div class="reward"><b>+${yen(effective[r.id])}</b><div class="meta">還元見込み</div></div>
+    </div>`).join("");
+}
+
+$("fab").onclick=()=>{editId=null;$("sheetTitle").textContent="利用を追加";$("saveEntry").textContent="保存する";$("pay").value=selectedPay;$("amount").value="";$("store").value="";$("memo").value="";openSheet("entrySheet")};
+$("cancelEntry").onclick=()=>closeSheet("entrySheet");
+$("entrySheet").onclick=e=>{if(e.target.id==="entrySheet")closeSheet("entrySheet")};
+$("saveEntry").onclick=()=>{
+  const amount=Number($("amount").value);
+  if(!amount||amount<1){alert("支払額を入力してね");return}
+  const data={pay:$("pay").value,rate:Number($("rate").value),date:$("date").value,amount,store:$("store").value.trim(),memo:$("memo").value.trim()};
+  if(editId) rows=rows.map(r=>r.id===editId?{...r,...data}:r);
+  else rows.push({...data,id:crypto.randomUUID(),created:String(Date.now())});
+  selectedPay=data.pay;closeSheet("entrySheet");persist();
+};
+window.editRow=id=>{
+  const r=rows.find(x=>x.id===id);if(!r)return;
+  editId=id;$("sheetTitle").textContent="利用を編集";$("saveEntry").textContent="変更を保存";
+  $("pay").value=r.pay;$("rate").value=r.rate;$("date").value=r.date;$("amount").value=r.amount;$("store").value=r.store||"";$("memo").value=r.memo||"";
+  openSheet("entrySheet");
+};
+window.deleteRow=id=>{if(confirm("この履歴を削除する？")){rows=rows.filter(r=>r.id!==id);persist()}};
+
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");
+  ["home","history","settings"].forEach(v=>$(v+"View").classList.toggle("hidden",v!==b.dataset.view));
+  $("fab").style.display=b.dataset.view==="settings"?"none":"block";
+});
+$("seeAll").onclick=()=>document.querySelector('.nav button[data-view="history"]').click();
+$("filterBtn").onclick=()=>{
+  const names=["すべて",...PAYS.map(p=>p.name)];
+  const next=names[(names.indexOf(filterPay)+1)%names.length];filterPay=next;
+  $("filterBtn").textContent=next==="すべて"?"絞り込み":next;
+  render();
+};
+$("saveSettings").onclick=()=>{
+  settings.periodCap=Math.max(1,Number($("periodCap").value)||2500);
+  settings.txCap=Math.max(1,Number($("txCap").value)||1500);
+  localStorage.setItem(SETKEY,JSON.stringify(settings));render();alert("設定を保存したよ");
+};
+function exportData(){
+  const blob=new Blob([JSON.stringify({rows,settings},null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="かなトク管理_バックアップ.json";a.click();URL.revokeObjectURL(a.href);
+}
+$("exportBtn").onclick=exportData;$("menuExport").onclick=exportData;
+$("importBtn").onclick=()=>$("importFile").click();$("menuImport").onclick=()=>$("importFile").click();
+$("importFile").onchange=async e=>{
+  try{
+    const d=JSON.parse(await e.target.files[0].text());
+    rows=Array.isArray(d)?d:(d.rows||[]);
+    if(d.settings)settings=d.settings;
+    localStorage.setItem(SETKEY,JSON.stringify(settings));persist();alert("読み込んだよ");
+  }catch{alert("バックアップを読み込めませんでした")}
+};
+$("clearBtn").onclick=()=>{if(confirm("すべての履歴を削除する？")){rows=[];persist()}};
+$("backupBtn").onclick=()=>openSheet("menuSheet");$("closeMenu").onclick=()=>closeSheet("menuSheet");
+$("menuSheet").onclick=e=>{if(e.target.id==="menuSheet")closeSheet("menuSheet")};
+render();
+</script>
+</body>
+</html>
